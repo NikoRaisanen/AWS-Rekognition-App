@@ -130,4 +130,6 @@ dmypy.json
 
 # Credentials
 niko11_user_credentials.csv
+
+# Ignore .idea files
 .idea/
