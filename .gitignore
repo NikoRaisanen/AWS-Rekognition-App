@@ -127,3 +127,7 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Credentials
+niko11_user_credentials.csv
+.idea/
