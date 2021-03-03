@@ -2,6 +2,7 @@ import csv
 import sys
 import json
 import boto3
+import os
 
 # Authenticating so that I can utilize AWS services
 with open('niko11_user_credentials.csv', 'r') as credentials:
@@ -12,30 +13,38 @@ with open('niko11_user_credentials.csv', 'r') as credentials:
         secret_access_key = line[3]
 
 
-def detect_labels(photo):
+def compare_faces(sourceFile, targetFile):
     client = boto3.client('rekognition',
                           aws_access_key_id=access_key_id,
                           aws_secret_access_key=secret_access_key,
                           region_name='us-west-1')
-    with open(photo, 'rb') as image:
-        response = client.detect_labels(
-            Image={'Bytes': image.read()})
-        return json.dumps(response, indent=4)
+    imageSource = open(sourceFile, 'rb')
+    imageTarget = open(targetFile, 'rb')
+
+    response = client.compare_faces(SimilarityThreshold=80,
+                                    SourceImage = {'Bytes': imageSource.read()},
+                                    TargetImage = {'Bytes': imageTarget.read()})
+    return json.dumps(response, indent=4)
 
 
 def main():
-    if len(sys.argv) != 2:
-        print('Please execute the file in the following format: python {script} {image.jpg}')
+    if len(sys.argv) != 3:
+        print('Please execute the file in the following format: python {script} {sourceFile} {targetFile}')
         sys.exit(1)
     else:
-        photo = sys.argv[1]
+        sourceFile = sys.argv[1]
+        targetFile = sys.argv[2]
 
     # Can always call data_string to see full Rekognition output
-    data_string = detect_labels(photo)
-    data_dict = json.loads(data_string)
+    RekognitionResults = compare_faces(sourceFile, targetFile)
+    for item in RekognitionResults['UnmatchedFaces']:
+        print(item)
+    # data_string = detect_labels(photo)
+    # data_dict = json.loads(data_string)
 
-    for item in data_dict['Labels']:
-        print(f"I am %{item['Confidence']:.2f} sure that this is a {item['Name']}")
+    # for item in data_dict['Labels']:
+    #     print(f"I am %{item['Confidence']:.2f} sure that this is a {item['Name']}")
+    # print(os.listdir(os.getcwd() + directory))  # Prints all files in the user-inputted directory (must be from the program root folder)
 
 
 if __name__ == "__main__":
