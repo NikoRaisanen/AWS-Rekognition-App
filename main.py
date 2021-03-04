@@ -3,6 +3,7 @@ import sys
 import json
 import boto3
 import os
+import time
 
 # Authenticating so that I can utilize AWS services
 with open('niko11_user_credentials.csv', 'r') as credentials:
@@ -13,37 +14,49 @@ with open('niko11_user_credentials.csv', 'r') as credentials:
         secret_access_key = line[3]
 
 
-def compare_faces(sourceFile, targetFile):
+def compare_faces(sourceFile, targetDir):
     client = boto3.client('rekognition',
                           aws_access_key_id=access_key_id,
                           aws_secret_access_key=secret_access_key,
                           region_name='us-west-1')
-    imageSource = open(sourceFile, 'rb')
-    imageTarget = open(targetFile, 'rb')
+    # imageSource = open(sourceFile, 'rb')
+    listImages = os.listdir(targetDir)
 
-    response = client.compare_faces(SimilarityThreshold=80,
-                                    SourceImage = {'Bytes': imageSource.read()},
-                                    TargetImage = {'Bytes': imageTarget.read()})
-    return json.dumps(response, indent=4)
+    for file in listImages:
+        listImagesMatch = [] 
+
+        imageSource = open(sourceFile, 'rb')
+        imageTarget = open(os.getcwd() + '\\' + 'Images' + '\\' + file, 'rb')
+        response = client.compare_faces(SimilarityThreshold=80,
+                                        SourceImage = {'Bytes': imageSource.read()},
+                                        TargetImage = {'Bytes': imageTarget.read()})
+        counter = 0
+        isPresent = False
+        for item in response['FaceMatches']:
+            counter += 1
+        if counter > 0:
+            isPresent = True
+            listImagesMatch.append(file)
+            print("Match found")
+        else:
+            print("Not a match")
+        time.sleep(1)   # For debugging purposes, remove in final version
+    
+    return listImagesMatch
 
 
 def main():
     if len(sys.argv) != 3:
-        print('Please execute the file in the following format: python {script} {sourceFile} {targetFile}')
+        print('Please execute the file in the following format: python {script} {sourceFile} {targetDir}')
         sys.exit(1)
     else:
         sourceFile = sys.argv[1]
-        targetFile = sys.argv[2]
+        targetDir = sys.argv[2]
 
-    # Can always call data_string to see full Rekognition output
-    RekognitionResults = compare_faces(sourceFile, targetFile)
-    for item in RekognitionResults['UnmatchedFaces']:
-        print(item)
-    # data_string = detect_labels(photo)
-    # data_dict = json.loads(data_string)
+    
+    listMatches = compare_faces(sourceFile, targetDir)
+    print(listMatches)
 
-    # for item in data_dict['Labels']:
-    #     print(f"I am %{item['Confidence']:.2f} sure that this is a {item['Name']}")
     # print(os.listdir(os.getcwd() + directory))  # Prints all files in the user-inputted directory (must be from the program root folder)
 
 
