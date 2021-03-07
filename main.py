@@ -122,16 +122,30 @@ class Ui_MainWindow(object):
         print(percentageComplete)
         self.progressBar.setValue(percentageComplete)
 
+def find_credentials():
+    localFiles = []
+    directoryContents =  os.listdir()
+    for item in directoryContents:
+        if os.path.isfile(item):
+            localFiles.append(item.casefold())
 
+    for file in localFiles:
+        if "credentials" and ".csv" in file:
+            return file
+        else:
+            print("No csv credentials file found. Make sure to save it in the same directory as this script with \"credentials\" in the name.")
 
+# Saving AWS Rekognition credentials in memory
+def aws_rekognition_authentication():
+    global access_key_id, secret_access_key
+    credentialsCSV = find_credentials()
+    with open(credentialsCSV, 'r') as credentials:
+        next(credentials)
+        reader = csv.reader(credentials)
+        for line in reader:
+            access_key_id = line[2]
+            secret_access_key = line[3]
 
-# Authenticating so that I can utilize AWS services
-with open('niko11_user_credentials.csv', 'r') as credentials:
-    next(credentials)
-    reader = csv.reader(credentials)
-    for line in reader:
-        access_key_id = line[2]
-        secret_access_key = line[3]
 
 
 def compare_faces(sourceFile, targetDir):
@@ -140,7 +154,7 @@ def compare_faces(sourceFile, targetDir):
                           aws_access_key_id=access_key_id,
                           aws_secret_access_key=secret_access_key,
                           region_name='us-west-1')
-    # imageSource = open(sourceFile, 'rb')
+    
     listImages = os.listdir(targetDir)
     numImages = len(listImages)
     imageProgress = 0
@@ -157,16 +171,14 @@ def compare_faces(sourceFile, targetDir):
                                         SourceImage = {'Bytes': imageSource.read()},
                                         TargetImage = {'Bytes': imageTarget.read()})
         counter = 0
-        isPresent = False
         for item in response['FaceMatches']:
             counter += 1
         if counter > 0:
-            isPresent = True
             listImagesMatch.append(file)
             print(f"Match found: {file}")
         else:
             print(f"Not a match: {file}")
-        time.sleep(1)   # For debugging purposes, remove in final version
+
     
     return listImagesMatch
 
@@ -180,17 +192,12 @@ def copy_files(listMatches):
         print(destination)
         shutil.copyfile(source, destination)
         print(f"Copying {item} to {destination}...")
-        time.sleep(1)   # Debugging purposes, remove in final version
 
 
 def main():
     global targetDir, filename
-    # if len(sys.argv) != 3:
-    #     print('Please execute the file in the following format: python {script} {sourceFile} {targetDir}')
-    #     sys.exit(1)
-    # else:
-    #     sourceFile = sys.argv[1]
-    #     targetDir = sys.argv[2]
+
+    aws_rekognition_authentication()
 
     sourceFile = filename
     targetDir = targetDir
