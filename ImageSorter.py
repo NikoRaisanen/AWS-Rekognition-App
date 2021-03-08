@@ -243,8 +243,7 @@ def main():
     listMatches = compare_faces(sourceFile, targetDir)
     print(f"Here are the files that returned as matches: {listMatches}")
     copy_files(listMatches)
-    ui.progressBar.setValue(100
-    )
+    ui.progressBar.setValue(100)
 
     print(f"Analysis complete! Processed {imageProgress}/{numImages} images!!!")
     ui.doneLabel.setText(f"Done processing {numImages} Images!")
