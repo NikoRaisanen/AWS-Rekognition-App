@@ -5,7 +5,7 @@ The program then compares the subject in the headshot to each of the valid image
 ## Accuracy
 Analysis is done by calling the AWS Rekognition us-west1 endpoint. Below you can get a taste for the accuracy of results:
 
-![](https://github.com/NikoRaisanen/AWS-Rekognition-App/blob/main/READMEContent/RekognitionExample.png)
+![](https://github.com/NikoRaisanen/AWS-Rekognition-App/blob/main/READMEContent/RekognitionExampleEdit.png)
 
 **I chose to use these images as an example because:**
 
@@ -29,7 +29,7 @@ This provides a more organized way to archive and look back on memories with spe
 - Give this user the "AmazonRekognitionFullAccess" permission policy
 - Download the .csv file which contains your credentials
 
-![](https://github.com/NikoRaisanen/AWS-Rekognition-App/blob/main/READMEContent/CredentialsWalkthrough2.png)
+![](https://github.com/NikoRaisanen/AWS-Rekognition-App/blob/main/READMEContent/CredentialsWalkthrough2Edit.png)
 
 
 ## How to use
