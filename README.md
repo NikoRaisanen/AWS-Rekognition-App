@@ -24,7 +24,7 @@ This provides a more organized way to archive and look back on memories with spe
 - Go to the users section of your IAM console https://console.aws.amazon.com/iam/home#/users
 - Add/create a user and check the box for programmatic access
 
-![](https://github.com/NikoRaisanen/AWS-Rekognition-App/blob/main/READMEContent/CredentialsWalkthrough.png)
+![](https://github.com/NikoRaisanen/AWS-Rekognition-App/blob/main/READMEContent/CredentialsWalkthroughEdit.png)
 
 - Give this user the "AmazonRekognitionFullAccess" permission policy
 - Download the .csv file which contains your credentials
