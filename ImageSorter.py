@@ -6,7 +6,6 @@ import sys
 import json
 import boto3
 import os
-import time
 import shutil
 from PyQt5 import QtCore, QtGui, QtWidgets
 
@@ -105,23 +104,21 @@ class Ui_MainWindow(object):
 
     def browseReference_handler(self):
         global filename
-        print("Browse reference handler clicked")
         filename = QtWidgets.QFileDialog.getOpenFileName()
         filename = filename[0]
-        print(filename)
+        print(f"Checking to see if we can find the person in {filename}")
         self.referenceText.setText(filename)
 
     def browseTargetDir_handler(self):
         global targetDir
-        print("Browse TargetDir handler clicked")
         targetDir = QtWidgets.QFileDialog.getExistingDirectory(None, 'Select project folder:', 'F:\\', QtWidgets.QFileDialog.ShowDirsOnly)
-        print(targetDir)
+        print(f"We will traverse {targetDir} to see which pictures contain the target person")
         self.targetDirText.setText(targetDir)
     
     def update_progress(self):
         global imageProgress
         percentageComplete = round((imageProgress / numImages) * 70, 0)
-        print(percentageComplete)
+        print(f"[+] Progress: {percentageComplete}%")
         self.progressBar.setValue(percentageComplete)
 
     def message_box(self, text):
@@ -137,10 +134,17 @@ def find_credentials():
     for item in directoryContents:
         if os.path.isfile(item):
             localFiles.append(item.casefold())
-
+    
+    foundCredentials = False
     for file in localFiles:
         if "credentials" and ".csv" in file:
+            print(f"Using {file} for authentication")
+            foundCredentials = True
             return file
+
+    if foundCredentials == False:
+        ui.message_box("No credentials file found. Make sure that it contains the word \"credentials\" and has an extension of .csv... Put the credentials file into the same directory as this script and restart the program!")
+        sys.exit(0)
 
 def process_input_files(referenceFile, targetFiles):
     validExtensions = [".jpg", ".png", ".jpeg"]
@@ -198,36 +202,38 @@ def compare_faces(sourceFile, targetDir):
     imageProgress = 0
 
     listImagesMatch = []
-    print(f"Total number of images {numImages}") 
+    print(f"[+] Total number of images to be analyzed: {numImages}")
     for file in validFiles:
         imageProgress += 1
         print(f"Processing image number {imageProgress}")
         ui.update_progress()
-        imageSource = open(sourceFile, 'rb')
-        imageTarget = open(targetDir + '\\' + file, 'rb')
-        response = client.compare_faces(SimilarityThreshold=80,
-                                        SourceImage = {'Bytes': imageSource.read()},
-                                        TargetImage = {'Bytes': imageTarget.read()})
-        counter = 0
-        for item in response['FaceMatches']:
-            counter += 1
-        if counter > 0:
-            listImagesMatch.append(file)
-            print(f"Match found: {file}")
-        else:
-            print(f"Not a match: {file}")
+
+        try:
+            imageSource = open(sourceFile, 'rb')
+            imageTarget = open(targetDir + '\\' + file, 'rb')
+            response = client.compare_faces(SimilarityThreshold=80,
+                                            SourceImage = {'Bytes': imageSource.read()},
+                                            TargetImage = {'Bytes': imageTarget.read()})
+            counter = 0
+            for item in response['FaceMatches']:
+                counter += 1
+            if counter > 0:
+                listImagesMatch.append(file)
+                print(f"Match found: {file}")
+            else:
+                print(f"Not a match: {file}")
+            
+        except:
+            print(f"[!!!] There was an error while analyzing {file}, likely that this file does not have a detectable face [!!!]")
 
     
     return listImagesMatch
 
 
 def copy_files(listMatches):
-    print(listMatches)
     for item in listMatches:
         source = targetDir + '\\' + item
-        print(source)
         destination = os.getcwd() + '\\' + 'Matches' + '\\' + item
-        print(destination)
         shutil.copyfile(source, destination)
         print(f"Copying {item} to {destination}...")
 
@@ -241,11 +247,11 @@ def main():
     print(f"sourceFile inputted to compare_faces: {sourceFile}")
 
     listMatches = compare_faces(sourceFile, targetDir)
-    print(f"Here are the files that returned as matches: {listMatches}")
+    print(f"[+] Here are the files that returned as matches: {listMatches}")
     copy_files(listMatches)
     ui.progressBar.setValue(100)
 
-    print(f"Analysis complete! Processed {imageProgress}/{numImages} images!!!")
+    print(f"[+] Analysis complete! Processed {imageProgress}/{numImages} images!!!")
     ui.doneLabel.setText(f"Done processing {numImages} Images!")
 
 
