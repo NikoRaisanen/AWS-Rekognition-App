@@ -7,7 +7,7 @@ The program then compares the subject in the headshot to each of the valid image
 [**Insert .gif of program in action here**]
 
 ## How to use
-1. Obtain AWS credentials in .csv format (see below)
+1. Obtain AWS credentials in .csv format (see "Getting credentials" below)
 2. Clone this repository `git clone https://github.com/NikoRaisanen/AWS-Rekognition-App.git`
 3. Copy the credentials .csv into the same directory that you cloned the repo to
 4. Install python dependencies [Show dependencies here... I think it is just PyQt5(?)]
@@ -28,7 +28,7 @@ Despite these differences, Rekognition was able to identify with strong certaint
 
 
 ## Getting credentials
-Use of the Amazon Rekognition service is not free, so each user of the application mus use their own credentials. The first 5,000 images per month are free, after which the price becomes $1 per 1,000 images. Make sure to log in or create an AWS account before following the steps below
+Use of the Amazon Rekognition service is not free, so each user of the application must use their own credentials. The first 5,000 images per month are free, after which the price becomes $1 per 1,000 images. The program will look for a file that contains the word "credentials" and has an extension of .csv in the same folder as ImageSorter.py - and use that for authentication. Make sure to log in or create an AWS account before following the steps below
 
 - Go to the users section of your IAM console https://console.aws.amazon.com/iam/home#/users
 - Add/create a user and check the box for programmatic access
@@ -39,4 +39,5 @@ Use of the Amazon Rekognition service is not free, so each user of the applicati
 - Download the .csv file which contains your credentials
 
 ![](https://github.com/NikoRaisanen/AWS-Rekognition-App/blob/main/READMEContent/CredentialsWalkthrough2Edit.png)
+- To use these credentials in the program - copy this credentials csv file into the same directory as ImageSorter.py
 
