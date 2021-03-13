@@ -1,1 +1,1 @@
-This file was created so that the Matches directory gets trackedo on github. If the reference person is found to be in a target image, then the target image will be copied to this folder.
+This is where images that return as a match will be copied to. This file is here so that the Matches folder is copied with a git clone - this .txt file can be deleted

@@ -10,6 +10,7 @@ import shutil
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 
+# Constructing the GUI
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
@@ -102,6 +103,7 @@ class Ui_MainWindow(object):
         self.browseTargetDir.clicked.connect(self.browseTargetDir_handler)
         self.pushButton.clicked.connect(main)
 
+
     def browseReference_handler(self):
         global filename
         filename = QtWidgets.QFileDialog.getOpenFileName()
@@ -109,17 +111,21 @@ class Ui_MainWindow(object):
         print(f"Checking to see if we can find the person in {filename}")
         self.referenceText.setText(filename)
 
+
     def browseTargetDir_handler(self):
         global targetDir
         targetDir = QtWidgets.QFileDialog.getExistingDirectory(None, 'Select project folder:', 'F:\\', QtWidgets.QFileDialog.ShowDirsOnly)
         print(f"We will traverse {targetDir} to see which pictures contain the target person")
         self.targetDirText.setText(targetDir)
     
+
     def update_progress(self):
         global imageProgress
         percentageComplete = round((imageProgress / numImages) * 70, 0)
+        percentageComplete = int(percentageComplete)
         print(f"[+] Progress: {percentageComplete}%")
         self.progressBar.setValue(percentageComplete)
+
 
     def message_box(self, text):
         msg = QtWidgets.QMessageBox()
@@ -128,24 +134,35 @@ class Ui_MainWindow(object):
         msg.setIcon(QtWidgets.QMessageBox.Warning)
         msg.exec()
 
+
+def get_script_path():
+    myPath = os.path.dirname(os.path.realpath(sys.argv[0]))
+    return myPath
+
+
+# Search the directory where this script is saved for file that contains string "credentials" (NOT case sensitive) and extension .csv
 def find_credentials():
     localFiles = []
-    directoryContents =  os.listdir()
+    scriptPath = get_script_path()
+    directoryContents = os.listdir(scriptPath)
     for item in directoryContents:
-        if os.path.isfile(item):
+        if os.path.isfile(scriptPath + "\\" + item):
             localFiles.append(item.casefold())
-    
+
     foundCredentials = False
     for file in localFiles:
         if "credentials" and ".csv" in file:
             print(f"Using {file} for authentication")
             foundCredentials = True
-            return file
+            credentialsPath = get_script_path() + "\\" + file
+            return credentialsPath
 
     if foundCredentials == False:
         ui.message_box("No credentials file found. Make sure that it contains the word \"credentials\" and has an extension of .csv... Put the credentials file into the same directory as this script and restart the program!")
         sys.exit(0)
 
+
+# Only process those files that are compatible with AWS Rekognition
 def process_input_files(referenceFile, targetFiles):
     validExtensions = [".jpg", ".png", ".jpeg"]
     validFiles = []
@@ -171,15 +188,14 @@ def process_input_files(referenceFile, targetFiles):
     else:
         ui.message_box("Reference image is invalid. Must have extension of .jpg, .jpeg, or .png and be smaller than 5MB in size. Exiting program...")
         sys.exit(0)
-        
-
-    print(referenceFile)
     return referenceFile, validFiles
+
 
 # Saving AWS Rekognition credentials in memory
 def aws_rekognition_authentication():
     global access_key_id, secret_access_key
     credentialsCSV = find_credentials()
+    print(credentialsCSV)
     with open(credentialsCSV, 'r') as credentials:
         next(credentials)
         reader = csv.reader(credentials)
@@ -226,14 +242,14 @@ def compare_faces(sourceFile, targetDir):
         except:
             print(f"[!!!] There was an error while analyzing {file}, likely that this file does not have a detectable face [!!!]")
 
-    
     return listImagesMatch
 
 
+# Copy images that returned as matches into a directory called Matches
 def copy_files(listMatches):
     for item in listMatches:
         source = targetDir + '\\' + item
-        destination = os.getcwd() + '\\' + 'Matches' + '\\' + item
+        destination = get_script_path() + '\\' + 'Matches' + '\\' + item
         shutil.copyfile(source, destination)
         print(f"Copying {item} to {destination}...")
 
