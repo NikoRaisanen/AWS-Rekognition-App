@@ -4,7 +4,9 @@ With this program you can automtically organize photos based on the people that 
 This application allows you to automatically organize your photos by the people that appear in them. First you upload a headshot of the person that you would like to find in other pictures. Then you upload a directory, the program will traverse this directory and prepare the valid files for analysis.
 The program then compares the subject in the headshot to each of the valid images in the uploaded directory. If the subject is found to be in the target image, then the file will be copied into a directory called "Matches"
 
-[**Insert .gif of program in action here**]
+![](https://github.com/NikoRaisanen/AWS-Rekognition-App/blob/main/READMEContent/ImageSorterExample.gif)
+
+In addition to the GUI I included terminal output in the case that the GUI stops responding. The above example shows me selecting my LinkedIn photo as the reference picture, and selecting a folder called Images as the target directory. Matches of this analysis were copied into the Matches folder, as shown by terminal output.
 
 
 ## Accuracy
