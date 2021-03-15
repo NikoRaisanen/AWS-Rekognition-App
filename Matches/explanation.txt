@@ -1,0 +1,1 @@
+Target images that return as matches will be copied into this folder. This text file is here so that Github copies this directory when cloning - Can delete this text file
