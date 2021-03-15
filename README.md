@@ -42,7 +42,7 @@ Use of the Amazon Rekognition service is not free, so each user of the applicati
 - Give this user the "AmazonRekognitionFullAccess" permission policy
 - Download the .csv file which contains your credentials
 
-![](https://github.com/NikoRaisanen/AWS-Rekognition-App/blob/main/READMEContent/CredentialsWalkthrough2Edit.png)
+![](https://drive.google.com/file/d/1SZC1H0cV6I_r1S1w1Up7KFZRNcoe0U2M/view?usp=sharing)
 - To use these credentials in the program - copy this credentials csv file into the same directory as ImageSorter.py
 
 ## Future plans
